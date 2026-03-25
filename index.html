@@ -133,18 +133,29 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     font-size: 12px;
     transition: transform 0.1s;
     min-height: 44px;
+    cursor: default;
   }
   .day-cell:active { transform: scale(0.95); }
   .day-cell.empty { cursor: default; }
-  .day-cell.past { background: #1a1a1a; color: #444; cursor: not-allowed; }
+  /* 活动前日期 - 极暗 */
+  .day-cell.past { background: #111; color: #2a2a2a; cursor: not-allowed; }
+  .day-cell.past .day-num { color: #2a2a2a; }
+  /* 占位删除 */
+  /* 未来日期 */
   .day-cell.future { background: #1a1a2e; border: 1px solid #2a2a3e; color: #888; cursor: not-allowed; }
-  .day-cell.active { background: linear-gradient(135deg, #1e3a1e, #142a14); border: 1px solid #2a4a2a; color: #e0e0e0; }
-  .day-cell.active:hover { border-color: #52c41a; }
-  .day-cell.unlocked { background: linear-gradient(135deg, #0a2a1a, #0d1f0d); border: 1px solid #52c41a; }
+  /* 过去活动期内未解锁 - 可补发解锁码，颜色偏暗但可点击 */
+  .day-cell.past-active { background: #141420; border: 1px solid #1e1e30; cursor: pointer; }
+  .day-cell.past-active:hover { border-color: #3a3a60; transform: scale(1.02); }
+  .day-cell.past-active .day-num { color: #3a3a55; }
+  .day-cell.past-active .gift-dim { font-size: 16px; opacity: 0.25; margin-top: 2px; }
+  /* 今天可解锁 - 金色高亮 */
+  .day-cell.active { background: linear-gradient(135deg, #1e3a1e, #142a14); border: 2px solid #ffd700; color: #e0e0e0; cursor: pointer; box-shadow: 0 0 10px rgba(255,215,0,0.25); }
+  .day-cell.active:hover { border-color: #52c41a; transform: scale(1.05); box-shadow: 0 0 14px rgba(82,196,26,0.3); }
+  /* 已解锁 */
+  .day-cell.unlocked { background: linear-gradient(135deg, #0a2a1a, #0d1f0d); border: 1px solid #52c41a; cursor: pointer; }
   .day-cell .day-num { font-size: 11px; color: #aaa; }
   .day-cell.active .day-num { color: #ccc; }
   .day-cell.unlocked .day-num { font-size: 10px; color: #52c41a; }
@@ -161,19 +172,37 @@
     color: #aaa;
   }
   .how-to-box strong { color: #ffd700; }
-  .unlocked-list { max-width: 600px; margin: 0 auto; padding: 0 12px 40px; }
+
+  /* ===== 开奖记录 ===== */
+  .unlocked-list { max-width: 600px; margin: 0 auto; padding: 0 12px 20px; }
   .unlocked-title { font-size: 14px; color: #aaa; margin-bottom: 8px; }
   .unlocked-item {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     background: #111;
     border-radius: 8px;
-    padding: 8px 12px;
-    margin-bottom: 4px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
     font-size: 13px;
+    border-left: 3px solid #1e3a1e;
   }
-  .unlocked-item .date-tag { color: #888; }
-  .unlocked-item .prize-tag { color: #52c41a; font-weight: bold; }
+  .unlocked-item-row1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .unlocked-item-row2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+  }
+  .date-tag { color: #666; font-size: 12px; }
+  .time-tag { color: #444; font-size: 11px; }
+  .uid-tag { color: #888; font-size: 11px; }
+  .prize-tag { color: #52c41a; font-weight: bold; font-size: 13px; }
+
+  /* ===== 管理员面板 ===== */
   .admin-panel { max-width: 600px; margin: 0 auto 20px; padding: 0 12px; display: none; }
   .admin-panel.show { display: block; }
   .admin-box { background: #1a0a0a; border: 1px solid #ff4d4f; border-radius: 12px; padding: 16px; }
@@ -206,6 +235,69 @@
   .admin-result { display: none; margin-top: 12px; background: #0a0a0a; border-radius: 8px; padding: 14px; text-align: center; }
   .admin-code { font-size: 36px; color: #ff4d4f; font-weight: bold; letter-spacing: 8px; }
   .admin-prize { font-size: 14px; color: #aaa; margin-top: 6px; }
+  .admin-save-btn {
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 6px;
+    color: #aaa;
+    font-size: 12px;
+    padding: 5px 14px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .admin-save-btn.saved { background: #1a3a1a; border-color: #52c41a; color: #52c41a; }
+
+  /* ===== 管理员发放记录 ===== */
+  .admin-log { margin-top: 16px; border-top: 1px solid #330000; padding-top: 14px; }
+  .admin-log-title {
+    color: #ff8888;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .admin-log-clear { font-size: 11px; color: #554444; cursor: pointer; }
+  .admin-log-item {
+    background: #0d0808;
+    border: 1px solid #2a1a1a;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    font-size: 12px;
+  }
+  .admin-log-row1 { display: flex; justify-content: space-between; align-items: center; }
+  .admin-log-row2 { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+  .log-uid { color: #ffd700; font-weight: bold; }
+  .log-date { color: #888; }
+  .log-prize { color: #52c41a; font-weight: bold; }
+  .log-code { color: #ff4d4f; font-family: monospace; letter-spacing: 3px; }
+  .log-time { color: #444; font-size: További10px; }
+  .log-status-btn {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+  }
+  .log-status-btn.pending { background: #2a1a00; color: #886600; }
+  .log-status-btn.issued { background: #0a2a0a; color: #52c41a; }
+  .admin-log-empty { color: #443333; font-size: 12px; text-align: center; padding: 12px; }
+  .admin-stats {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 10px;
+    background: #0d0808;
+    border-radius: 8px;
+  }
+  .admin-stat { font-size: 11px; color: #888; }
+  .admin-stat span { color: #ff8888; font-weight: bold; }
+
+  /* ===== 弹窗 ===== */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -265,6 +357,8 @@
     width: 100%;
   }
   .modal-error { font-size: 13px; color: #ff4d4f; margin-top: -10px; margin-bottom: 10px; min-height: 20px; }
+
+  /* ===== 开奖动画 ===== */
   .prize-reveal-overlay {
     display: none;
     position: fixed;
@@ -355,12 +449,16 @@
 <div class="header">
   <h1>🎯 OKX 交易日历奖励<span id="adminBadge" class="admin-badge" style="display:none;">管理员模式</span></h1>
   <p>每天交易 · 每天开奖 · 每人专属</p>
+  <div style="margin-top:6px;font-size:11px;color:#555;">
+    📅 日历按月自动更新 &nbsp;·&nbsp; 🔗 链接永久有效，保存即可长期使用
+  </div>
 </div>
 
 <div class="name-section" id="nameSection">
   <div class="name-box">
-    <label>我的昵称</label>
-    <input id="nameInput" type="text" placeholder="输入群昵称" maxlength="20" onkeydown="if(event.key==='Enter')confirmName()">
+    <label>我的UID</label>
+    <input id="nameInput" type="text" placeholder="输入OKX UID" maxlength="30"
+           onkeydown="if(event.key==='Enter')confirmName()">
     <button onclick="confirmName()">确认</button>
   </div>
   <div id="userBadge" class="user-badge" style="display:none;">
@@ -384,7 +482,8 @@
 <div class="how-to" id="howTo" style="display:none;">
   <div class="how-to-box">
     🔑 <strong>如何获得解锁码？</strong><br>
-    发当天交易截图到群里 → 管理员核实后发给你<strong>4位解锁码</strong> → 点击对应日期输入解锁 → 奖励自动揭晓
+    发当日交易截图到群里 → 管理员核实后发给你<strong>4位解锁码</strong> → 点击对应日期输入解锁 → 奖励自动揭晓<br>
+    <span style="font-size:12px;color:#666;">💡 支持补领：若管理员未能及时回复，第二天补发解锁码同样有效</span>
   </div>
 </div>
 
@@ -402,28 +501,55 @@
   <div id="unlockedItems"></div>
 </div>
 
+<!-- 管理员面板 -->
 <div class="admin-panel" id="adminPanel">
   <div class="admin-box">
-    <h3>🔑 管理员查询面板</h3>
+    <h3>🔑 管理员操作面板</h3>
+
+    <!-- 统计数据 -->
+    <div class="admin-stats" id="adminStats">
+      <div class="admin-stat">总发放: <span id="statTotal">0</span> 次</div>
+      <div class="admin-stat">待确认: <span id="statPending">0</span> 次</div>
+      <div class="admin-stat">已发放: <span id="statIssued">0</span> 次</div>
+    </div>
+
+    <!-- 补发说明 -->
+    <div style="background:#1a0d00;border:1px solid #3a2000;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#aa8844;line-height:1.7;">
+      💡 <strong style="color:#ffa940;">支持任意日期补发</strong>：输入用户UID + 任意历史日期，即可查到对应解锁码。例如今天（25日）可补发昨天（24日）的码，用户点击24日方格输入即可领取。
+    </div>
+    <!-- 查询框 -->
     <div class="admin-row">
-      <label>用户昵称</label>
-      <input id="adminUser" type="text" placeholder="输入用户群昵称">
+      <label>用户UID</label>
+      <input id="adminUser" type="text" placeholder="输入用户OKX UID">
     </div>
     <div class="admin-row">
       <label>查询日期</label>
       <input id="adminDate" type="date">
     </div>
     <button class="admin-query-btn" onclick="adminQuery()">查询解锁码 + 奖励预览</button>
+
     <div class="admin-result" id="adminResult">
       <div style="font-size:12px;color:#666;margin-bottom:4px;">
-        用户 <strong id="resUser" style="color:#ffd700;"></strong> · <span id="resDate"></span>
+        UID <strong id="resUser" style="color:#ffd700;"></strong> · <span id="resDate"></span>
       </div>
       <div class="admin-code" id="resCode"></div>
       <div class="admin-prize" id="resPrize"></div>
+      <button class="admin-save-btn" id="adminSaveBtn" onclick="saveToLog()">📝 记录到发放日志</button>
     </div>
+
+    <!-- 发放记录日志 -->
+    <div class="admin-log">
+      <div class="admin-log-title">
+        📋 奖励发放记录
+        <span class="admin-log-clear" onclick="clearLog()">清空记录</span>
+      </div>
+      <div id="adminLogItems"></div>
+    </div>
+
   </div>
 </div>
 
+<!-- 解锁码输入弹窗 -->
 <div class="modal-overlay" id="unlockModal">
   <div class="modal-box">
     <div class="modal-title">🔐 输入解锁码</div>
@@ -441,6 +567,7 @@
   </div>
 </div>
 
+<!-- 开奖动画 -->
 <div class="prize-reveal-overlay" id="prizeReveal">
   <div class="confetti-wrap" id="confettiWrap"></div>
   <div class="prize-box">
@@ -459,29 +586,51 @@
 <div class="toast" id="toast"></div>
 
 <script>
+/* ============================================================
+   配置区
+   ============================================================ */
 const SALT = 'OKX_REWARD_2026';
 const ACTIVITY_START = '2026-03-17';
 
-const PRIZES = [
-  { name: '返佣卡 3张',  emoji: '🃏', weight: 15, type: 'rebate' },
-  { name: '返佣卡 4张',  emoji: '🃏', weight: 13, type: 'rebate' },
-  { name: '体验金 8.8U', emoji: '🎁', weight: 13, type: 'trial'  },
-  { name: '返佣卡 5张',  emoji: '🃏', weight: 12, type: 'rebate' },
-  { name: '体验金 10U',  emoji: '🎁', weight: 12, type: 'trial'  },
-  { name: 'USDT 5U',    emoji: '💰', weight: 8,  type: 'usdt'   },
-  { name: '体验金 15U',  emoji: '🎁', weight: 2,  type: 'trial'  },
-  { name: '体验金 5U',   emoji: '🎁', weight: 2,  type: 'trial'  },
-  { name: '返佣卡 2张',  emoji: '🃏', weight: 4,  type: 'rebate' },
-  { name: '体验金 4U',   emoji: '🎁', weight: 3,  type: 'trial'  },
-  { name: 'USDT 2U',    emoji: '💰', weight: 3,  type: 'usdt'   },
-  { name: '体验金 2U',   emoji: '🎁', weight: 3,  type: 'trial'  },
-  { name: '返佣卡 1张',  emoji: '🃏', weight: 3,  type: 'rebate' },
-  { name: 'USDT 1U',    emoji: '💰', weight: 3,  type: 'usdt'   },
-  { name: 'USDT 0.5U',  emoji: '💰', weight: 2,  type: 'usdt'   },
-  { name: 'USDT 0.2U',  emoji: '💰', weight: 1,  type: 'usdt'   },
-  { name: '🧧 红包大奖', emoji: '🧧', weight: 1,  type: 'hongbao', special: true },
-];
+/*
+  奖池设计（权重总计 1000）
+  概率说明：
+  - 好奖励(返佣卡3-5张 + 体验金8.8/10U + USDT 5U) ≈ 70.1%
+  - USDT 0.1/0.2/0.5U 高概率（小额安慰奖，调高）
+  - 返佣卡1张 中等概率
+  - 红包 概率调高（3.5%）
+  - 体验金2U 低概率
+  - USDT1/2U、返佣卡2张、体验金4U 极低（约30天出现1-2次）
 
+  预算估算（50人 × 约20天 = 1000次抽奖）：
+  直接USDT支出 ≈ 170U（在150-200U预算内）
+  体验金/返佣卡不计入直接USDT预算
+*/
+const PRIZES = [
+  { name: '返佣卡 3张',  emoji: '🃏', weight: 220, type: 'rebate' },   // 22.0%
+  { name: '返佣卡 4张',  emoji: '🃏', weight: 135, type: 'rebate' },   // 13.5%
+  { name: '体验金 8.8U', emoji: '🎁', weight: 111, type: 'trial'  },   // 11.1%
+  { name: '返佣卡 5张',  emoji: '🃏', weight: 110, type: 'rebate' },   // 11.0%
+  { name: '体验金 10U',  emoji: '🎁', weight: 100, type: 'trial'  },   // 10.0%  ↑好奖励 = 70.1%
+  { name: 'USDT 5U',    emoji: '💰', weight: 25,  type: 'usdt'   },   //  2.5%
+  { name: '体验金 15U',  emoji: '🎁', weight: 7,   type: 'trial'  },   //  0.7%
+  { name: '体验金 5U',   emoji: '🎁', weight: 11,  type: 'trial'  },   //  1.1%
+  { name: '返佣卡 1张',  emoji: '🃏', weight: 55,  type: 'rebate' },   //  5.5% 中等↑
+  { name: 'USDT 0.5U',  emoji: '💰', weight: 45,  type: 'usdt'   },   //  4.5% 高↑
+  { name: 'USDT 0.2U',  emoji: '💰', weight: 55,  type: 'usdt'   },   //  5.5% 高↑
+  { name: 'USDT 0.1U',  emoji: '💰', weight: 80,  type: 'usdt'   },   //  8.0% 高↑
+  { name: '🧧 红包大奖', emoji: '🧧', weight: 35,  type: 'hongbao', special: true }, // 3.5% 高↑
+  { name: '体验金 2U',   emoji: '🎁', weight: 3,   type: 'trial'  },   //  0.3% 低↓
+  { name: 'USDT 2U',    emoji: '💰', weight: 2,   type: 'usdt'   },   //  0.2% 极低↓↓
+  { name: 'USDT 1U',    emoji: '💰', weight: 2,   type: 'usdt'   },   //  0.2% 极低↓↓
+  { name: '返佣卡 2张',  emoji: '🃏', weight: 2,   type: 'rebate' },   //  0.2% 极低↓↓
+  { name: '体验金 4U',   emoji: '🎁', weight: 2,   type: 'trial'  },   //  0.2% 极低↓↓
+];
+// 权重总和 = 1000
+
+/* ============================================================
+   哈希函数
+   ============================================================ */
 function hashStr(str) {
   let h = 2166136261 >>> 0;
   for (let i = 0; i < str.length; i++) {
@@ -504,26 +653,56 @@ function getUnlockCode(username, year, month, day) {
   return (hashStr(`${username}_${year}_${month}_${day}_${SALT}`) % 10000).toString().padStart(4, '0');
 }
 
+/* ============================================================
+   存储：用户开奖记录（含时间戳）
+   格式：{ "2026_3_25": { ts: 1711..., uid: "12345" } }
+   兼容旧格式 { "2026_3_25": true }
+   ============================================================ */
 function getStorageKey(u) { return `okx_cal_${u.toLowerCase().trim()}`; }
 function loadUnlocked(u) { try { return JSON.parse(localStorage.getItem(getStorageKey(u)) || '{}'); } catch { return {}; } }
 function saveUnlocked(u, d) { try { localStorage.setItem(getStorageKey(u), JSON.stringify(d)); } catch {} }
 
-let currentUser = '', currentYear = new Date().getFullYear(), currentMonth = new Date().getMonth() + 1;
-let pendingDate = null, unlocked = {};
+/* ============================================================
+   存储：管理员发放日志
+   格式：[{ ts, uid, year, month, day, prize, code, status }]
+   ============================================================ */
+const ADMIN_LOG_KEY = 'okx_admin_log_v2';
+function loadAdminLog() { try { return JSON.parse(localStorage.getItem(ADMIN_LOG_KEY) || '[]'); } catch { return []; } }
+function saveAdminLog(log) { try { localStorage.setItem(ADMIN_LOG_KEY, JSON.stringify(log)); } catch {} }
+
+/* ============================================================
+   状态变量
+   ============================================================ */
+let currentUser = '',
+    currentYear = new Date().getFullYear(),
+    currentMonth = new Date().getMonth() + 1;
+let pendingDate = null,
+    unlocked = {};
 const isAdmin = new URLSearchParams(location.search).has('admin');
 
+// 当前查询结果（用于保存日志）
+let lastQueryResult = null;
+
+/* ============================================================
+   初始化
+   ============================================================ */
 window.onload = function () {
   if (isAdmin) {
     document.getElementById('adminBadge').style.display = 'inline-block';
     document.getElementById('adminPanel').classList.add('show');
     const t = new Date();
-    document.getElementById('adminDate').value = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+    document.getElementById('adminDate').value =
+      `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+    renderAdminLog();
   }
 };
 
+/* ============================================================
+   昵称/UID 确认
+   ============================================================ */
 function confirmName() {
   const name = document.getElementById('nameInput').value.trim();
-  if (!name) { showToast('请输入你的群昵称'); return; }
+  if (!name) { showToast('请输入你的OKX UID'); return; }
   currentUser = name;
   unlocked = loadUnlocked(name);
   document.getElementById('badgeName').textContent = name;
@@ -537,58 +716,117 @@ function confirmName() {
 
 function changeName() {
   document.getElementById('nameInput').value = currentUser;
-  ['userBadge','statsBar','howTo','calendarWrap','unlockedList'].forEach(id => document.getElementById(id).style.display = 'none');
+  ['userBadge','statsBar','howTo','calendarWrap','unlockedList'].forEach(
+    id => document.getElementById(id).style.display = 'none'
+  );
   currentUser = '';
 }
 
+/* ============================================================
+   日历渲染
+   ============================================================ */
 function renderCalendar() {
-  document.getElementById('calTitle').textContent = `${currentYear}年 ${String(currentMonth).padStart(2,'0')}月`;
+  document.getElementById('calTitle').textContent =
+    `${currentYear}年 ${String(currentMonth).padStart(2,'0')}月`;
   const grid = document.getElementById('calGrid');
   grid.innerHTML = '';
+
   ['日','一','二','三','四','五','六'].forEach(d => {
-    const el = document.createElement('div'); el.className = 'cal-dow'; el.textContent = d; grid.appendChild(el);
+    const el = document.createElement('div');
+    el.className = 'cal-dow';
+    el.textContent = d;
+    grid.appendChild(el);
   });
+
   const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
   const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const actStart = new Date(ACTIVITY_START);
-  for (let i = 0; i < firstDay; i++) { const el = document.createElement('div'); el.className = 'day-cell empty'; grid.appendChild(el); }
+  actStart.setHours(0, 0, 0, 0);
+
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement('div');
+    el.className = 'day-cell empty';
+    grid.appendChild(el);
+  }
+
   for (let d = 1; d <= daysInMonth; d++) {
     const cell = document.createElement('div');
     const cellDate = new Date(currentYear, currentMonth - 1, d);
+    cellDate.setHours(0, 0, 0, 0);
     const dateKey = `${currentYear}_${currentMonth}_${d}`;
+
+    const isBeforeActivity = cellDate < actStart;
     const isFuture = cellDate > today;
-    const beforeActivity = cellDate < actStart;
-    if (unlocked[dateKey]) {
+    const isToday = cellDate.getTime() === today.getTime();
+    const isUnlocked = !!unlocked[dateKey];
+    // 活动期内已过去但未解锁（支持管理员补发解锁码）
+    const isPastActive = !isBeforeActivity && !isFuture && !isToday && !isUnlocked;
+
+    if (isUnlocked) {
+      // 已解锁：显示奖励图标，点击可查看详情
       const prize = getPrize(currentUser, currentYear, currentMonth, d);
       cell.className = 'day-cell unlocked';
       cell.innerHTML = `<span class="day-num">${d}日</span><span class="prize-mini">${prize.emoji}<br>${prize.name.split(' ')[0]}</span>`;
       cell.onclick = () => showToast('已开奖：' + prize.name);
-    } else if (beforeActivity) {
+
+    } else if (isBeforeActivity) {
+      // 活动开始前：极暗，不可点击
       cell.className = 'day-cell past';
-      cell.innerHTML = `<span class="day-num">${d}</span>`;
+      cell.innerHTML = `<span class="day-num" style="color:#222;">${d}</span>`;
+
+    } else if (isPastActive) {
+      // 活动期内已过去但未解锁：偏暗可点击（支持补发解锁码）
+      cell.className = 'day-cell past-active';
+      cell.innerHTML = `<span class="day-num">${d}日</span><span class="gift-dim">🎁</span>`;
+      cell.onclick = () => openUnlockModal(currentYear, currentMonth, d);
+
     } else if (isFuture) {
+      // 未来日期：灰色礼盒，不可点击
       cell.className = 'day-cell future';
       cell.innerHTML = `<span class="day-num">${d}</span><span style="font-size:18px;">🎁</span>`;
+
     } else {
+      // 今天：金色高亮，可解锁
       cell.className = 'day-cell active';
-      cell.innerHTML = `<span class="day-num">${d}日</span><span class="gift-icon">🎁</span>`;
+      cell.innerHTML = `<span class="day-num" style="color:#ffd700;font-weight:bold;">${d}日 ✨</span><span class="gift-icon">🎁</span>`;
       cell.onclick = () => openUnlockModal(currentYear, currentMonth, d);
     }
     grid.appendChild(cell);
   }
 }
 
-function prevMonth() { currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; } renderCalendar(); }
-function nextMonth() { currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; } renderCalendar(); }
-
-function renderStats() {
-  document.getElementById('statUnlocked').textContent = Object.keys(unlocked).length;
-  const today = new Date(), actStart = new Date(ACTIVITY_START);
-  const start = actStart > new Date(today.getFullYear(), today.getMonth(), 1) ? actStart : new Date(today.getFullYear(), today.getMonth(), 1);
-  document.getElementById('statDays').textContent = Math.max(0, Math.floor((today - start) / 86400000) + 1);
+function prevMonth() {
+  currentMonth--;
+  if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+  renderCalendar();
+}
+function nextMonth() {
+  currentMonth++;
+  if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+  renderCalendar();
 }
 
+/* ============================================================
+   统计栏
+   ============================================================ */
+function renderStats() {
+  document.getElementById('statUnlocked').textContent = Object.keys(unlocked).length;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const actStart = new Date(ACTIVITY_START);
+  actStart.setHours(0,0,0,0);
+  const start = actStart > new Date(today.getFullYear(), today.getMonth(), 1)
+    ? actStart
+    : new Date(today.getFullYear(), today.getMonth(), 1);
+  document.getElementById('statDays').textContent =
+    Math.max(0, Math.floor((today - start) / 86400000) + 1);
+}
+
+/* ============================================================
+   解锁弹窗
+   ============================================================ */
 function openUnlockModal(year, month, day) {
   if (!currentUser) return;
   pendingDate = { year, month, day };
@@ -599,7 +837,10 @@ function openUnlockModal(year, month, day) {
   setTimeout(() => document.getElementById('d0').focus(), 100);
 }
 
-function closeModal() { document.getElementById('unlockModal').classList.remove('show'); pendingDate = null; }
+function closeModal() {
+  document.getElementById('unlockModal').classList.remove('show');
+  pendingDate = null;
+}
 
 function digitInput(idx) {
   const el = document.getElementById('d' + idx);
@@ -609,13 +850,17 @@ function digitInput(idx) {
 }
 
 function digitKey(e, idx) {
-  if (e.key === 'Backspace' && !document.getElementById('d'+idx).value && idx > 0) document.getElementById('d'+(idx-1)).focus();
+  if (e.key === 'Backspace' && !document.getElementById('d'+idx).value && idx > 0)
+    document.getElementById('d'+(idx-1)).focus();
   if (e.key === 'Enter') confirmUnlock();
 }
 
 function confirmUnlock() {
   const code = ['d0','d1','d2','d3'].map(id => document.getElementById(id).value).join('');
-  if (code.length < 4) { document.getElementById('modalError').textContent = '请输入完整的4位解锁码'; return; }
+  if (code.length < 4) {
+    document.getElementById('modalError').textContent = '请输入完整的4位解锁码';
+    return;
+  }
   const { year, month, day } = pendingDate;
   if (code !== getUnlockCode(currentUser, year, month, day)) {
     document.getElementById('modalError').textContent = '解锁码错误，请核对后重新输入';
@@ -624,24 +869,35 @@ function confirmUnlock() {
     return;
   }
   const dateKey = `${year}_${month}_${day}`;
-  unlocked[dateKey] = true;
+  // 保存时记录时间戳和UID
+  unlocked[dateKey] = { ts: Date.now(), uid: currentUser };
   saveUnlocked(currentUser, unlocked);
-  closeModal(); renderCalendar(); renderStats(); renderUnlockedList();
+  closeModal();
+  renderCalendar();
+  renderStats();
+  renderUnlockedList();
   showPrizeReveal(getPrize(currentUser, year, month, day), `${year}年${month}月${day}日`);
 }
 
+/* ============================================================
+   开奖动画
+   ============================================================ */
 function showPrizeReveal(prize, dateStr) {
   document.getElementById('revealEmoji').textContent = prize.emoji;
   document.getElementById('revealDate').textContent = dateStr + ' 开奖';
   document.getElementById('revealName').textContent = prize.name;
-  const tip = document.getElementById('revealHongbaoTip'), sub = document.getElementById('revealSub');
+  const tip = document.getElementById('revealHongbaoTip');
+  const sub = document.getElementById('revealSub');
   if (prize.special) { tip.style.display = 'block'; sub.style.display = 'none'; }
   else { tip.style.display = 'none'; sub.style.display = 'block'; }
   document.getElementById('prizeReveal').classList.add('show');
   launchConfetti();
 }
 
-function closePrizeReveal() { document.getElementById('prizeReveal').classList.remove('show'); document.getElementById('confettiWrap').innerHTML = ''; }
+function closePrizeReveal() {
+  document.getElementById('prizeReveal').classList.remove('show');
+  document.getElementById('confettiWrap').innerHTML = '';
+}
 
 function launchConfetti() {
   const colors = ['#ffd700','#52c41a','#1890ff','#ff4d4f','#faad14','#722ed1'];
@@ -655,29 +911,197 @@ function launchConfetti() {
   }
 }
 
+/* ============================================================
+   开奖记录列表（用户侧）
+   显示：日期+时间 | UID | 奖励
+   ============================================================ */
 function renderUnlockedList() {
   const container = document.getElementById('unlockedItems');
-  const keys = Object.keys(unlocked).sort();
-  if (!keys.length) { container.innerHTML = '<div style="font-size:13px;color:#555;text-align:center;padding:16px;">暂无开奖记录，快去晒单解锁吧~</div>'; return; }
-  container.innerHTML = keys.map(k => {
+  // 对所有月份的记录按时间排序（最新在前）
+  const keys = Object.keys(unlocked).sort((a, b) => {
+    const [ay,am,ad] = a.split('_').map(Number);
+    const [by,bm,bd] = b.split('_').map(Number);
+    return new Date(by,bm-1,bd) - new Date(ay,am-1,ad);
+  });
+
+  if (!keys.length) {
+    container.innerHTML = '<div style="font-size:13px;color:#555;text-align:center;padding:16px;">暂无开奖记录，快去晒单解锁吧~</div>';
+    return;
+  }
+
+  // 统计信息
+  const firstKey = keys[keys.length - 1];
+  const lastKey = keys[0];
+  const [fy,fm,fd] = firstKey.split('_').map(Number);
+  const [ly,lm,ld] = lastKey.split('_').map(Number);
+  const totalPrizeValue = keys.reduce((sum, k) => {
+    const p = getPrize(currentUser, ...k.split('_').map(Number));
+    const v = p.name.match(/[\d.]+/);
+    return sum + (v ? parseFloat(v[0]) : 0);
+  }, 0);
+
+  const statsHtml = `
+    <div style="background:#0d1a0d;border:1px solid #1a2a1a;border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:12px;">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+        <span style="color:#666;">📊 共开奖 <strong style="color:#52c41a;">${keys.length}</strong> 天</span>
+        <span style="color:#666;">📅 ${fy}/${fm}/${fd} — ${ly}/${lm}/${ld}</span>
+        <span style="color:#666;">💰 累计奖励值 <strong style="color:#ffd700;">${totalPrizeValue.toFixed(1)}U+</strong></span>
+      </div>
+    </div>`;
+
+  container.innerHTML = statsHtml + keys.map(k => {
     const [y, m, d] = k.split('_').map(Number);
     const prize = getPrize(currentUser, y, m, d);
-    return `<div class="unlocked-item"><span class="date-tag">${y}年${m}月${d}日</span><span class="prize-tag">${prize.emoji} ${prize.name}</span></div>`;
+    const entry = unlocked[k];
+    // 兼容旧格式 (true) 和新格式 ({ts, uid})
+    const ts = (entry && typeof entry === 'object') ? entry.ts : null;
+    const uid = (entry && typeof entry === 'object') ? entry.uid : currentUser;
+    const timeStr = ts ? formatTime(ts) : '—';
+    return `
+      <div class="unlocked-item">
+        <div class="unlocked-item-row1">
+          <span class="date-tag">📅 ${y}年${m}月${d}日</span>
+          <span class="prize-tag">${prize.emoji} ${prize.name}</span>
+        </div>
+        <div class="unlocked-item-row2">
+          <span class="uid-tag">UID: ${uid}</span>
+          <span class="time-tag">⏱ ${timeStr}</span>
+        </div>
+      </div>`;
   }).join('');
 }
 
+/* ============================================================
+   管理员查询
+   ============================================================ */
 function adminQuery() {
   const user = document.getElementById('adminUser').value.trim();
   const dateStr = document.getElementById('adminDate').value;
-  if (!user || !dateStr) { alert('请填写用户昵称和日期'); return; }
+  if (!user || !dateStr) { alert('请填写用户UID和日期'); return; }
   const [year, month, day] = dateStr.split('-').map(Number);
   const code = getUnlockCode(user, year, month, day);
   const prize = getPrize(user, year, month, day);
+
   document.getElementById('resUser').textContent = user;
   document.getElementById('resDate').textContent = `${year}年${month}月${day}日`;
   document.getElementById('resCode').textContent = code;
   document.getElementById('resPrize').textContent = `该日奖励：${prize.emoji} ${prize.name}`;
+
+  const saveBtn = document.getElementById('adminSaveBtn');
+  saveBtn.textContent = '📝 记录到发放日志';
+  saveBtn.className = 'admin-save-btn';
   document.getElementById('adminResult').style.display = 'block';
+
+  // 暂存当前查询结果
+  lastQueryResult = { user, year, month, day, code, prize: prize.name, prizeEmoji: prize.emoji };
+}
+
+/* ============================================================
+   保存到管理员日志
+   ============================================================ */
+function saveToLog() {
+  if (!lastQueryResult) return;
+  const log = loadAdminLog();
+
+  // 检查是否已存在相同记录
+  const exists = log.find(e =>
+    e.uid === lastQueryResult.user &&
+    e.year === lastQueryResult.year &&
+    e.month === lastQueryResult.month &&
+    e.day === lastQueryResult.day
+  );
+  if (exists) {
+    showToast('该记录已在日志中');
+    return;
+  }
+
+  log.unshift({
+    ts: Date.now(),
+    uid: lastQueryResult.user,
+    year: lastQueryResult.year,
+    month: lastQueryResult.month,
+    day: lastQueryResult.day,
+    prize: lastQueryResult.prize,
+    prizeEmoji: lastQueryResult.prizeEmoji,
+    code: lastQueryResult.code,
+    status: 'pending' // pending = 待发放, issued = 已发放
+  });
+  saveAdminLog(log);
+
+  const btn = document.getElementById('adminSaveBtn');
+  btn.textContent = '✅ 已记录';
+  btn.className = 'admin-save-btn saved';
+
+  renderAdminLog();
+  showToast('已记录到发放日志');
+}
+
+/* ============================================================
+   切换日志条目状态
+   ============================================================ */
+function toggleLogStatus(idx) {
+  const log = loadAdminLog();
+  if (!log[idx]) return;
+  log[idx].status = log[idx].status === 'pending' ? 'issued' : 'pending';
+  saveAdminLog(log);
+  renderAdminLog();
+}
+
+/* ============================================================
+   清空日志
+   ============================================================ */
+function clearLog() {
+  if (!confirm('确认清空所有发放记录？此操作不可恢复。')) return;
+  saveAdminLog([]);
+  renderAdminLog();
+}
+
+/* ============================================================
+   渲染管理员日志
+   ============================================================ */
+function renderAdminLog() {
+  const log = loadAdminLog();
+  const container = document.getElementById('adminLogItems');
+  const total = log.length;
+  const issued = log.filter(e => e.status === 'issued').length;
+  const pending = total - issued;
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statIssued').textContent = issued;
+
+  if (!total) {
+    container.innerHTML = '<div class="admin-log-empty">暂无记录。查询后点击"记录到发放日志"添加</div>';
+    return;
+  }
+
+  container.innerHTML = log.map((e, i) => {
+    const statusLabel = e.status === 'issued' ? '✅ 已发放' : '⏳ 待发放';
+    const statusClass = e.status === 'issued' ? 'issued' : 'pending';
+    return `
+      <div class="admin-log-item">
+        <div class="admin-log-row1">
+          <span class="log-uid">UID: ${e.uid}</span>
+          <button class="log-status-btn ${statusClass}" onclick="toggleLogStatus(${i})">${statusLabel}</button>
+        </div>
+        <div class="admin-log-row2">
+          <span class="log-date">${e.year}/${e.month}/${e.day}</span>
+          <span class="log-prize">${e.prizeEmoji} ${e.prize}</span>
+          <span class="log-code">${e.code}</span>
+        </div>
+        <div style="font-size:10px;color:#333;margin-top:3px;">记录时间: ${formatTime(e.ts)}</div>
+      </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   工具函数
+   ============================================================ */
+function formatTime(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 function showToast(msg) {
