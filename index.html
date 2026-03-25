@@ -212,6 +212,34 @@
     100% { transform: scale(1); opacity: 1; }
   }
 
+  /* ===== 奖励规则 ===== */
+  .rules-section {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 0 16px 20px;
+  }
+  .rules-title {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .rule-item {
+    background: #1a1a2e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .rule-days { color: #ffd700; font-weight: bold; font-size: 13px; }
+  .rule-reward { color: #52c41a; margin-top: 2px; }
 
   /* ===== 解锁模态框 ===== */
   .modal-overlay {
