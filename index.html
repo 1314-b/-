@@ -370,7 +370,7 @@
     margin: 0 auto;
     padding: 0 16px 30px;
   }
-  .unlocked-title { font-size: 14px; color: #888; margin-bottom: 10px; }
+  .unlocked-title { font-size: 15px; color: #e0e0e0; font-weight: bold; margin-bottom: 12px; }
   .unlocked-item {
     display: flex;
     justify-content: space-between;
@@ -384,6 +384,16 @@
   }
   .unlocked-item .date-tag { color: #bbb; }
   .unlocked-item .prize-tag { color: #52c41a; font-weight: bold; }
+
+  /* ===== 管理员用户记录区块 ===== */
+  .admin-all-records {
+    max-width: 900px;
+    margin: 0 auto 20px;
+    padding: 16px 20px;
+    background: #080f1a;
+    border: 1px solid #ffd70033;
+    border-radius: 14px;
+  }
 
   /* ===== 管理员面板 ===== */
   .admin-panel {
@@ -456,7 +466,7 @@
 
 <!-- 顶部标题 -->
 <div class="header">
-  <h1>🎯 OKX 交易日历奖励</h1>
+  <h1>🎯 OKX 交易日历奖励<span id="adminBadge" style="display:none;margin-left:8px;background:#ff4d4f;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;">🔐 管理专属</span></h1>
   <p>每天交易·每天开奖·每人专属</p>
 </div>
 
@@ -481,7 +491,7 @@
   <h3>🔐 管理员工具 · 生成解锁码</h3>
   <div class="admin-row">
     <input type="text" id="adminUser" placeholder="用户UID（纯数字）" style="flex:2;">
-    <input type="date" id="adminDate" style="flex:2;">
+    <input type="date" id="adminDate" style="color-scheme:dark;" style="flex:2;">
     <button onclick="generateCode()">查询解锁码 + 奖励预览</button>
   </div>
   <div class="admin-result" id="adminResult" style="display:none;">
@@ -490,16 +500,6 @@
     <div class="admin-prize" id="resPrize"></div>
   </div>
 
-  <!-- 用户开奖记录总览 -->
-  <div style="margin-top:20px;border-top:1px solid #2a1a1a;padding-top:16px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <span style="color:#ff9500;font-size:14px;font-weight:bold;">🗂️ 用户开奖记录（本设备）</span>
-      <button onclick="renderAllUsersRecords()" style="background:#1a3a5a;border:1px solid #1890ff;border-radius:6px;color:#1890ff;font-size:12px;padding:4px 10px;cursor:pointer;">刷新</button>
-    </div>
-    <div id="allUsersRecords" style="max-height:420px;overflow-y:auto;">
-      <div style="color:#555;font-size:12px;text-align:center;padding:16px;">加载中...</div>
-    </div>
-  </div>
 </div>
 
 <!-- 统计条 -->
@@ -546,8 +546,38 @@
 
 <!-- 已开奖列表 -->
 <div class="unlocked-list" id="unlockedList" style="display:none;">
-  <div class="unlocked-title">📋 我的开奖记录</div>
+  <div class="unlocked-title" id="unlockedListTitle">📋 我的开奖记录</div>
   <div id="unlockedItems"></div>
+</div>
+
+<!-- 管理员用户开奖记录（仅管理员可见） -->
+<div class="admin-all-records" id="adminAllRecords" style="display:none;">
+  <!-- 标题行 -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <span style="color:#ffd700;font-size:15px;font-weight:bold;">📋 用户开奖记录</span>
+    <button onclick="renderAllUsersRecords()" style="background:#1a3a5a;border:1px solid #1890ff;border-radius:6px;color:#1890ff;font-size:12px;padding:5px 12px;cursor:pointer;">↻ 刷新</button>
+  </div>
+  <!-- UID搜索栏 -->
+  <div style="display:flex;gap:8px;margin-bottom:10px;">
+    <input id="uidSearch" type="text" placeholder="🔍 搜索UID或是是昵称…" oninput="renderAllUsersRecords()"
+      style="flex:1;background:#111;border:1px solid #2a4a6a;border-radius:8px;color:#fff;font-size:13px;padding:8px 12px;outline:none;">
+    <button onclick="document.getElementById('uidSearch').value='';renderAllUsersRecords();"
+      style="background:#1a1a2e;border:1px solid #444;border-radius:8px;color:#888;font-size:12px;padding:8px 10px;cursor:pointer;">✕ 清空</button>
+  </div>
+  <!-- 操作按钮行 -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+    <button onclick="exportRecords()"
+      style="background:#0d2a1a;border:1px solid #52c41a66;border-radius:8px;color:#52c41a;font-size:12px;padding:7px 14px;cursor:pointer;">📤 导出备份</button>
+    <label style="background:#0d1a2e;border:1px solid #1890ff66;border-radius:8px;color:#1890ff;font-size:12px;padding:7px 14px;cursor:pointer;">
+      📥 导入复原
+      <input type="file" accept=".json" onchange="importRecords(this)" style="display:none;">
+    </label>
+    <button onclick="clearSingleUID()"
+      style="background:#1a1a0a;border:1px solid #faad1466;border-radius:8px;color:#faad14;font-size:12px;padding:7px 14px;cursor:pointer;">🧹 清除指定UID</button>
+    <button onclick="clearAllRecords()"
+      style="background:#1a0a0a;border:1px solid #ff4d4f66;border-radius:8px;color:#ff4d4f;font-size:12px;padding:7px 14px;cursor:pointer;">🗑️ 清除全部记录</button>
+  </div>
+  <div id="allUsersRecords"></div>
 </div>
 
 <!-- 解锁输入模态框 -->
@@ -587,24 +617,24 @@ const SALT = 'OKX_REWARD_2026';
 const ACTIVITY_START = '2026-03-17'; // 活动开始日期，可调整
 
 const PRIZES = [
-  // ===== 高概率档 ~72% =====
-  { name: '🧧 私信群主领取红包', emoji: '🧧', value: 0,   weight: 319, type:'hongbao', special: true },
-  { name: 'USDT 0.1U',          emoji: '💰', value: 0.1, weight: 140, type:'usdt'    },
-  { name: 'USDT 0.2U',          emoji: '💰', value: 0.2, weight: 115, type:'usdt'    },
-  { name: 'USDT 0.3U',          emoji: '💰', value: 0.3, weight: 85,  type:'usdt'    },
-  // ===== 中等档 ~16% =====
-  { name: '返佣卡 1张',          emoji: '🃏', value: 1,   weight: 160, type:'rebate'  },
-  // ===== 中高档 ~14.5% =====
-  { name: 'USDT 0.4U',          emoji: '💰', value: 0.4, weight: 60,  type:'usdt'    },
-  { name: 'USDT 0.5U',          emoji: '💰', value: 0.5, weight: 50,  type:'usdt'    },
-  { name: 'USDT 0.6U',          emoji: '💰', value: 0.6, weight: 35,  type:'usdt'    },
+  // 高概率档：私信红包+小额USDT（合计~54.6%）
+  { name: '🧧 私信群主领取红包', emoji: '🧧', value: 0,   weight: 215, type:'hongbao', special: true },
+  { name: 'USDT 0.1U',                  emoji: '💰', value: 0.1, weight: 110, type:'usdt'    },
+  { name: 'USDT 0.2U',                  emoji: '💰', value: 0.2, weight: 90,  type:'usdt'    },
+  { name: 'USDT 0.3U',                  emoji: '💰', value: 0.3, weight: 68,  type:'usdt'    },
+  // 中等档：返佣卡1张（37.5%）
+  { name: '返佣卡 1张',         emoji: '🃏', value: 1,   weight: 375, type:'rebate'  },
+  // 中低档：高面值USDT（~11.8%）
+  { name: 'USDT 0.4U',                  emoji: '💰', value: 0.4, weight: 50,  type:'usdt'    },
+  { name: 'USDT 0.5U',                  emoji: '💰', value: 0.5, weight: 40,  type:'usdt'    },
+  { name: 'USDT 0.6U',                  emoji: '💰', value: 0.6, weight: 28,  type:'usdt'    },
   // ===== 中下档 ~2.5% =====
-  { name: '体验金 2U',           emoji: '🎁', value: 2,   weight: 25,  type:'trial'   },
+  { name: '体验金 2U',           emoji: '🎁', value: 2,   weight: 12,  type:'trial'   },
   // ===== 极低档 ~0.3% each (30天内可领到1次) =====
   { name: 'USDT 1U',            emoji: '💰', value: 1,   weight: 3,   type:'usdt'    },
   { name: 'USDT 2U',            emoji: '💰', value: 2,   weight: 3,   type:'usdt'    },
-  { name: '体验金 4U',           emoji: '🎁', value: 4,   weight: 2,   type:'trial'   },
-  { name: '返佣卡 2张',          emoji: '🃏', value: 2,   weight: 3,   type:'rebate'  },
+  { name: '体验金 4U',           emoji: '🎁', value: 4,   weight: 1,   type:'trial'   },
+  { name: '返佣卡 2张',          emoji: '🃏', value: 2,   weight: 5,   type:'rebate'  },
 ];
 
 // ===== 工具函数 =====
@@ -654,19 +684,20 @@ let currentUser = '';
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth() + 1;
 let pendingDate = null;
+const isAdmin = new URLSearchParams(location.search).has('admin');
 
 // ===== 初始化 =====
 window.onload = function() {
-  // 检查URL参数
-  const params = new URLSearchParams(location.search);
-  if (params.has('admin')) {
+  if (isAdmin) {
     document.getElementById('adminPanel').style.display = 'block';
+    const badge = document.getElementById('adminBadge');
+    if (badge) badge.style.display = 'inline';
     const now = new Date();
     const mm = String(now.getMonth()+1).padStart(2,'0');
     const dd = String(now.getDate()).padStart(2,'0');
     document.getElementById('adminDate').value = `${now.getFullYear()}-${mm}-${dd}`;
-    setTimeout(renderAllUsersRecords, 100);
   }
+  const params = new URLSearchParams(location.search);
   if (params.get('u')) {
     document.getElementById('nameInput').value = params.get('u');
     confirmName();
@@ -687,10 +718,12 @@ function confirmName() {
   document.getElementById('calendarWrap').style.display = 'block';
   document.getElementById('hintBanner').style.display = 'block';
   document.getElementById('unlockedList').style.display = 'block';
+  if (isAdmin) document.getElementById('adminAllRecords').style.display = 'block';
 
   renderCalendar();
   updateStats();
   renderUnlockedList();
+  if (isAdmin) renderAllUsersRecords();
 }
 
 function changeName() {
@@ -702,6 +735,7 @@ function changeName() {
   document.getElementById('calendarWrap').style.display = 'none';
   document.getElementById('hintBanner').style.display = 'none';
   document.getElementById('unlockedList').style.display = 'none';
+  document.getElementById('adminAllRecords').style.display = 'none';
 }
 
 // ===== 日历渲染 =====
@@ -755,12 +789,27 @@ function renderCalendar() {
   }
 }
 
+function goToday() {
+  const now = new Date();
+  currentYear = now.getFullYear();
+  currentMonth = now.getMonth() + 1;
+  renderCalendar();
+}
 function prevMonth() {
-  currentMonth--;
-  if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+  const actStart = new Date(ACTIVITY_START);
+  const prevY = currentMonth === 1 ? currentYear - 1 : currentYear;
+  const prevM = currentMonth === 1 ? 12 : currentMonth - 1;
+  // 不允许导航到活动开始前的月份
+  if (new Date(prevY, prevM - 1, 28) < new Date(actStart.getFullYear(), actStart.getMonth(), 1)) return;
+  currentMonth = prevM; currentYear = prevY;
   renderCalendar();
 }
 function nextMonth() {
+  // 允许查看未来3个月（活动持续运营）
+  const now = new Date();
+  const futureLimit = new Date(now.getFullYear(), now.getMonth() + 3, 1);
+  const nextDate = new Date(currentYear, currentMonth, 1); // currentMonth already 1-indexed
+  if (nextDate >= futureLimit) return;
   currentMonth++;
   if (currentMonth > 12) { currentMonth = 1; currentYear++; }
   renderCalendar();
@@ -804,23 +853,25 @@ function doUnlock() {
     return;
   }
 
-  // 正确！标记已解锁
+  // 正确！先保存日期，再关弹窗（closeModal会把pendingDate置null）
+  const { year: uYear, month: uMonth, day: uDay } = pendingDate;
   const unlocked = loadUnlocked(currentUser);
-  const dateKey = `${pendingDate.year}_${pendingDate.month}_${pendingDate.day}`;
+  const dateKey = `${uYear}_${uMonth}_${uDay}`;
   unlocked[dateKey] = { ts: Date.now(), uid: currentUser };
   saveUnlocked(currentUser, unlocked);
 
   closeModal();
 
-  // 显示奖励
-  const prize = getPrize(currentUser, pendingDate.year, pendingDate.month, pendingDate.day);
-  const dateStr = `${pendingDate.year}年${pendingDate.month}月${pendingDate.day}日`;
+  // 显示奖励弹窗+彩蛋动画
+  const prize = getPrize(currentUser, uYear, uMonth, uDay);
+  const dateStr = `${uYear}年${uMonth}月${uDay}日`;
   showPrizeReveal(prize, dateStr);
 
-  // 刷新
+  // 刷新页面数据
   renderCalendar();
   updateStats();
   renderUnlockedList();
+  if (isAdmin) renderAllUsersRecords();
 }
 
 // ===== 奖励揭示 =====
@@ -897,7 +948,7 @@ function renderUnlockedList() {
     const [y,m,d] = k.split('_').map(Number);
     totalVal += getPrize(currentUser, y, m, d).value;
   });
-  const statsHtml = `<div style="display:flex;justify-content:space-between;padding:8px 14px;background:#111a2a;border-radius:8px;margin-bottom:8px;font-size:12px;color:#888;">
+  const statsHtml = `<div style="display:flex;justify-content:space-between;padding:8px 14px;background:#111a2a;border-radius:8px;margin-bottom:8px;font-size:12px;color:#bbb;">
     <span>🏆 共开奖 <strong style="color:#ffd700;">${keys.length}</strong> 天</span>
     <span>📅 ${first} — ${last}</span>
     <span>💰 累计奖励值 <strong style="color:#52c41a;">${totalVal.toFixed(1)}U+</strong></span>
@@ -909,9 +960,9 @@ function renderUnlockedList() {
     let timeStr = '';
     if (rec && rec.ts) {
       const dt = new Date(rec.ts);
-      timeStr = `<span style="color:#888;font-size:11px;">⏱ ${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}</span>`;
+      timeStr = `<span style="color:#aaa;font-size:11px;">⏱ ${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}</span>`;
     }
-    const uidStr = (rec && rec.uid) ? `<span style="color:#888;font-size:11px;">UID: ${rec.uid}</span>` : '';
+    const uidStr = (rec && rec.uid) ? `<span style="color:#aaa;font-size:11px;">UID: ${rec.uid}</span>` : '';
     return `<div class="unlocked-item" style="flex-direction:column;align-items:flex-start;gap:4px;">
       <div style="display:flex;justify-content:space-between;width:100%;">
         <span class="date-tag">📅 ${y}年${m}月${d}日</span>
@@ -922,22 +973,29 @@ function renderUnlockedList() {
   }).join('');
 }
 
-// ===== 用户开奖记录总览（管理员用）=====
+// ===== 用户开奖记录总览（管理员用，甲乙丙栏）=====
 function renderAllUsersRecords() {
   const container = document.getElementById('allUsersRecords');
   if (!container) return;
   const PREFIX = 'okx_cal_';
+  const searchEl = document.getElementById('uidSearch');
+  const keyword = searchEl ? searchEl.value.trim().toLowerCase() : '';
   const uids = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && k.startsWith(PREFIX)) uids.push(k.slice(PREFIX.length));
+    if (k && k.startsWith(PREFIX)) {
+      const uid = k.slice(PREFIX.length);
+      if (!keyword || uid.toLowerCase().includes(keyword)) uids.push(uid);
+    }
   }
   if (!uids.length) {
-    container.innerHTML = '<div style="color:#666;font-size:12px;text-align:center;padding:20px;">暂无用户开奖记录<br><span style="font-size:11px;color:#444;">用户在该设备解锁后自动显示</span></div>';
+    container.innerHTML = keyword
+      ? `<div style="color:#aaa;font-size:13px;text-align:center;padding:24px;">未找到匹配 "<strong style="color:#ffd700;">${keyword}</strong>" 的用户</div>`
+      : '<div style="color:#aaa;font-size:13px;text-align:center;padding:24px;">暂无用户开奖记录<br><span style="font-size:12px;color:#666;">用户在该设备解锁后自动显示</span></div>';
     return;
   }
   uids.sort();
-  const cards = uids.map(uid => {
+  const cards = uids.map((uid, idx) => {
     const unlocked = loadUnlocked(uid);
     const keys = Object.keys(unlocked).sort();
     if (!keys.length) return '';
@@ -952,21 +1010,108 @@ function renderAllUsersRecords() {
         const dt = new Date(rec.ts);
         timeStr = `${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
       }
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #1a2a3a;">
-        <span style="color:#bbb;font-size:12px;">${m}月${d}日</span>
-        <span style="color:#ffd700;font-size:12px;">${prize.emoji} ${prize.name}</span>
-        <span style="color:#666;font-size:11px;">${timeStr}</span>
+      return `<div style="background:#111c2e;border-radius:8px;padding:8px 10px;margin-bottom:6px;border-left:3px solid #52c41a;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:#ddd;font-size:12px;font-weight:bold;">📅 ${y}年${m}月${d}日</span>
+          <span style="color:#52c41a;font-size:13px;font-weight:bold;">${prize.emoji} ${prize.name}</span>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:4px;">
+          <span style="color:#aaa;font-size:11px;">UID: ${uid}</span>
+          ${timeStr ? `<span style="color:#888;font-size:11px;">⏱ ${timeStr}</span>` : ''}
+        </div>
       </div>`;
     }).join('');
-    return `<div style="background:#0d1520;border:1px solid #1a3a5a;border-radius:10px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #1a3a5a;">
-        <span style="color:#ffd700;font-weight:bold;font-size:13px;">UID: ${uid}</span>
-        <span style="color:#52c41a;font-size:12px;">共 <strong>${keys.length}</strong> 天 · 累计奖励 <strong style="color:#ffd700;">${totalVal.toFixed(1)}U+</strong></span>
+    const displayUID = uid.length > 12 ? uid.slice(0,12) + '…' : uid;
+    return `<div style="background:#0d1828;border:1px solid #1e3a5a;border-radius:12px;padding:14px;display:flex;flex-direction:column;min-width:0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:8px;border-bottom:2px solid #1e3a5a;">
+        <div>
+          <div style="color:#ffd700;font-weight:bold;font-size:13px;" title="${uid}">UID: ${displayUID}</div>
+          <div style="color:#52c41a;font-size:11px;margin-top:2px;">共 ${keys.length} 天 · ${totalVal.toFixed(1)}U+</div>
+        </div>
       </div>
-      ${rows}
+      <div style="overflow-y:auto;max-height:280px;">${rows}</div>
     </div>`;
-  }).filter(Boolean).join('');
-  container.innerHTML = cards || '<div style="color:#555;font-size:12px;text-align:center;padding:12px;">暂无记录</div>';
+  }).filter(Boolean);
+  if (!cards.length) {
+    container.innerHTML = '<div style="color:#aaa;font-size:13px;text-align:center;padding:16px;">暂无记录</div>';
+    return;
+  }
+  container.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">${cards.join('')}</div>`;
+}
+
+// ===== 管理员数据操作 =====
+
+// 导出所有用户记录为 JSON 备份文件
+function exportRecords() {
+  const PREFIX = 'okx_cal_';
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(PREFIX)) data[k] = localStorage.getItem(k);
+  }
+  if (!Object.keys(data).length) { alert('暂无记录可导出'); return; }
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const now = new Date();
+  a.href = url;
+  a.download = `okx_records_backup_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// 导入 JSON 备份，复原记录（合并模式）
+function importRecords(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      let count = 0;
+      for (const [k, v] of Object.entries(data)) {
+        if (k.startsWith('okx_cal_')) { localStorage.setItem(k, v); count++; }
+      }
+      alert(`导入成功！共复原 ${count} 个用户记录`);
+      renderAllUsersRecords();
+    } catch { alert('文件格式错误，请确认是有效的备份 JSON 文件'); }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// 清除指定 UID 的记录
+function clearSingleUID() {
+  const uid = prompt('请输入要清除的用户UID：');
+  if (!uid) return;
+  const key = 'okx_cal_' + uid.trim();
+  if (!localStorage.getItem(key)) { alert(`未找到 UID: ${uid.trim()} 的记录`); return; }
+  if (confirm(`确定清除 UID: ${uid.trim()} 的所有开奖记录？此操作不可撤销。`)) {
+    localStorage.removeItem(key);
+    alert('已清除');
+    renderAllUsersRecords();
+  }
+}
+
+// 清除全部用户记录
+function clearAllRecords() {
+  const PREFIX = 'okx_cal_';
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(PREFIX)) keys.push(k);
+  }
+  if (!keys.length) { alert('暂无记录'); return; }
+  if (!confirm(`⚠️ 确定清除全部 ${keys.length} 个用户的开奖记录？
+建议先点「导出备份」保存数据！
+此操作不可撤销。`)) return;
+  const confirmText = prompt('请输入 "CLEAR" 确认清除：');
+  if (confirmText !== 'CLEAR') { alert('输入错误，已取消'); return; }
+  keys.forEach(k => localStorage.removeItem(k));
+  alert(`已清除 ${keys.length} 个用户的所有记录`);
+  if (currentUser) renderUnlockedList();
+  renderAllUsersRecords();
 }
 
 // ===== 管理员工具 =====
