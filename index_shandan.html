@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>OKX 交易日历抽奖</title>
+<title>OKX社群：晒单抽奖活动</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #0d0d1a; color: #e0e0e0; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; min-height: 100vh; }
@@ -93,8 +93,8 @@
 <body>
 
 <div class="header">
-  <h1>🎯 OKX 交易日历奖励<span id="adminBadge" style="display:none;margin-left:8px;background:#ff4d4f;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;">🔐 管理专属</span></h1>
-  <p>每天交易·每天开奖·每人专属</p>
+  <h1>🎯 OKX社群：晒单抽奖活动<span id="adminBadge" style="display:none;margin-left:8px;background:#ff4d4f;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;">🔐 管理专属</span></h1>
+  <p>晒单有奖·每天开奖·每人专属</p>
 </div>
 
 <!-- adminDate 供JS使用（不可见） -->
@@ -468,7 +468,7 @@ function renderAllUsersRecords(){
   if(!allUids.length){container.innerHTML=keyword?'<div style="color:#aaa;font-size:13px;text-align:center;padding:24px;">未找到匹配 "<strong style="color:#ffd700;">'+keyword+'</strong>" 的用户</div>':'<div style="color:#aaa;font-size:13px;text-align:center;padding:24px;">暂无用户开奖记录</div>';return;}
   allUids.sort();
   var cards=allUids.map(function(uid){
-    var unlocked=loadUnlocked(uid),keys=Object.keys(unlocked).sort();if(!keys.length)return'';
+    var unlocked=loadUnlocked(uid),keys=Object.keys(unlocked).sort().reverse();if(!keys.length)return'';
     var totalVal=0;
     var rows=keys.map(function(k){
       var pts=k.split('_').map(Number),y=pts[0],m=pts[1],d=pts[2];
